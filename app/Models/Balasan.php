@@ -15,7 +15,7 @@ class Balasan extends Model
         return $this->belongsTo(Pengaduan::class, 'pengaduan_id');
     }
 
-    public function user(){
-        return $this->belongsTo(User::class, 'user_id');
+    public function guru(){
+        return $this->belongsTo(User::class, 'guru_id');
     }
 }

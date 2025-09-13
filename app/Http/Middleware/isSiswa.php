@@ -15,7 +15,7 @@ class isSiswa
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if($request->user() && $request->user()->role == 'siswa') {
+        if(auth()->check() && $request->user()->role == 'siswa') {
             return $next($request);
         }
 

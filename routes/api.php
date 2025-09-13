@@ -32,20 +32,20 @@ Route::prefix('v1')->group(function(){
     });
 
     Route::prefix('siswa')->group(function(){
-        Route::get('pengaduan', [PengaduanController::class, 'index']);
-        Route::get('pengaduan/{id}', [PengaduanController::class, 'showbyuser']);
-        Route::post('pengaduan/create', [PengaduanController::class, 'store']);
-        Route::put('pengaduan/update/{id}', [PengaduanController::class, 'update']);
-        Route::delete('pengaduan/delete/{id}', [PengaduanController::class, 'destroy']);
-    })->middleware('isSiswa');
+        Route::get('pengaduan', [PengaduanController::class, 'index'])->middleware('isSiswa');
+        Route::get('pengaduan/{id}', [PengaduanController::class, 'showbyuser'])->middleware('isSiswa');
+        Route::post('pengaduan/create', [PengaduanController::class, 'store'])->middleware('isSiswa');
+        Route::put('pengaduan/update/{id}', [PengaduanController::class, 'update'])->middleware('isSiswa');
+        Route::delete('pengaduan/delete/{id}', [PengaduanController::class, 'destroy'])->middleware('isSiswa');
+    });
 
     Route::prefix('guru')->group(function(){
-        Route::get('pengaduan', [PengaduanController::class, 'getData']);
-        Route::get('pengaduan/{id}', [PengaduanController::class, 'show']);
-        Route::post('balasan/create', [PengaduanController::class, 'reply']);
-        Route::put('balasan/update/{id}', [PengaduanController::class, 'editBalasan']);
-        Route::delete('balasan/delete/{id}', [PengaduanController::class, 'hapusBalasan']);
-        Route::put('pengaduan/status/{id}', [PengaduanController::class, 'setStatus']);
-        Route::get('pengaduan/filter', [PengaduanController::class, 'filter']);
-    })->middleware('isGuru');
+        Route::get('pengaduan', [PengaduanController::class, 'getData'])->middleware('isGuru');
+        Route::get('pengaduan/{id}', [PengaduanController::class, 'show'])->middleware('isGuru');
+        Route::post('balasan/create/{id}', [PengaduanController::class, 'reply'])->middleware('isGuru');
+        Route::put('balasan/update/{id}', [PengaduanController::class, 'editBalasan'])->middleware('isGuru');
+        Route::delete('balasan/delete/{id}', [PengaduanController::class, 'hapusBalasan'])->middleware('isGuru');
+        Route::put('pengaduan/status/{id}', [PengaduanController::class, 'setStatus'])->middleware('isGuru');
+        Route::get('filter', [PengaduanController::class, 'filterPengaduan'])->middleware('isGuru');
+    });
 });

@@ -127,7 +127,7 @@ class PengaduanController extends Controller
     public function show($id){
         $pengaduan = Pengaduan::where('id', $id)->with('user')->first();
 
-        $balasan = Balasan::where('pengaduan_id', $id)->first();
+        $balasan = Balasan::where('pengaduan_id', $id)->with('guru')->first();
 
         $oke = '';
         if(!$balasan){
@@ -191,7 +191,7 @@ class PengaduanController extends Controller
         ], 200);
     }
 
-    public function filter(){
+    public function filterPengaduan(){
         $baru = Pengaduan::where('status', 'baru')->with('user')->get();
         $proses = Pengaduan::where('status', 'diproses')->with('user')->get();
         $selesai = Pengaduan::where('status', 'selesai')->with('user')->get();

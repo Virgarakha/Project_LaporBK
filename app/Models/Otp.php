@@ -10,4 +10,6 @@ class Otp extends Model
     use HasFactory;
     protected $table = 'otp';
     protected $guarded = [];
+
+    public $timestamps = false;
 }

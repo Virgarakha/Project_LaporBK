@@ -18,7 +18,7 @@ class AuthController extends Controller
     public function register(Request $request){
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required|email|unique.users',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required',
             'class' => 'required'
         ]);
@@ -29,28 +29,33 @@ class AuthController extends Controller
             ], 422);
         }
 
+        // Simpan user
         $user = User::create([
-            'full_name' => 'required',
-            'email' => 'required',
+            'full_name' => $request->name,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'siswa',
             'class' => $request->class
         ]);
 
+        // Generate OTP 6 digit
         $otp = rand(100000, 999999);
 
+        // Simpan OTP
         Otp::create([
             'user_id' => $user->id,
             'code' => $otp,
             'otp_expires_at' => Carbon::now()->addMinutes(10)
         ]);
 
+        // Kirim OTP ke email user
         Mail::to($user->email)->send(new OtpMail($user, $otp));
 
         return response()->json([
-            'message' => 'Berhasil daftar, Otp sudah dikirim ke email!'
+            'message' => 'Berhasil daftar, OTP sudah dikirim ke email!'
         ], 200);
     }
+
 
     public function verifyOtp(Request $request){
         $request->validate([
@@ -133,32 +138,50 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function resendOtp(Request $request){
-        $request->validate([
-            'email' => 'required|email'
-        ]);
+public function resendOtp(Request $request){
+    $request->validate([
+        'email' => 'required|email'
+    ]);
 
-        $user = User::where('email', $request->email)->first();
+    $user = User::where('email', $request->email)->first();
 
-        if(!$user){
-            return response()->json([
-                'message' => 'user tidak terdaftar'
-            ], 404);
-        }
+    if(!$user){
+        return response()->json([
+            'message' => 'User tidak terdaftar'
+        ], 404);
+    }
 
-        if($user->is_verified){
-            return response()->json([
-                'message' => 'Akun sudah di verifikasi'
-            ], 422);
-        }
+    if($user->is_verified){
+        return response()->json([
+            'message' => 'Akun sudah di verifikasi'
+        ], 422);
+    }
 
-        $otpUser = Otp::where('user_id', $user->id)->first();
+    $otp = rand(100000, 999999);
 
-        $otp = rand(100000, 999999);
+    $otpUser = Otp::where('user_id', $user->id)->first();
 
+    if($otpUser){
+        // Update OTP jika record sudah ada
         $otpUser->update([
             'code' => $otp,
             'otp_expires_at' => Carbon::now()->addMinutes(10)
         ]);
+    } else {
+        // Buat baru jika record belum ada
+        Otp::create([
+            'user_id' => $user->id,
+            'code' => $otp,
+            'otp_expires_at' => Carbon::now()->addMinutes(10)
+        ]);
     }
+
+    // Kirim OTP ke email user
+    Mail::to($user->email)->send(new OtpMail($user, $otp));
+
+    return response()->json([
+        'message' => 'OTP berhasil dikirim ulang ke email!'
+    ]);
+}
+
 }

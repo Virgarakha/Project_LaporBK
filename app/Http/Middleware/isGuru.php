@@ -15,7 +15,7 @@ class isGuru
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if($request->user() && $request->user()->role == 'guru') {
+        if(auth()->check() && $request->user()->role === 'guru') {
             return $next($request);
         }
 
